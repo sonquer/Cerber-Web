@@ -26,6 +26,7 @@ import {
     Button
 } from '@chakra-ui/core';
 import Editor from "@monaco-editor/react";
+import styles from './Availability.module.css';
 
 class Availability extends Component<{match: any}, {isOpen: boolean, value: string}> {
     constructor(props: {match: any}) {
@@ -70,19 +71,19 @@ class Availability extends Component<{match: any}, {isOpen: boolean, value: stri
                     <TabPanels>
                         <TabPanel>
                             <List spacing={3} marginTop={5}>
-                                <ListItem onClick={() => this.onOpen('{}')}>
+                                <ListItem onClick={() => this.onOpen('{}')} className={styles.listItem}>
                                     <ListIcon icon="check-circle" color="green.500" />
                                     <small>[2020.04.01 16:00]</small> <Code>200 OK</Code> in <Code>31ms</Code>
                                 </ListItem>
-                                <ListItem onClick={() => this.onOpen('{}')}>
+                                <ListItem onClick={() => this.onOpen('{}')} className={styles.listItem}>
                                     <ListIcon icon="check-circle" color="green.500" />
                                     <small>[2020.04.01 16:01]</small> <Code>200 OK</Code> in <Code>11ms</Code>
                                 </ListItem>
-                                <ListItem onClick={() => this.onOpen('{}')}>
+                                <ListItem onClick={() => this.onOpen('{}')} className={styles.listItem}>
                                     <ListIcon icon="check-circle" color="green.500" />
                                     <small>[2020.04.01 16:02]</small> <Code>200 OK</Code> in <Code>43ms</Code>
                                 </ListItem>
-                                <ListItem onClick={() => this.onOpen('{}')}>
+                                <ListItem onClick={() => this.onOpen('{}')} className={styles.listItem}>
                                     <ListIcon icon="warning" color="pink.500" />
                                     <small>[2020.04.01 16:03]</small> <Code>500 Internal server error</Code> in <Code>7010ms</Code>
                                 </ListItem>

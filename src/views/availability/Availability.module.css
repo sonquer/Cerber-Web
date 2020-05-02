@@ -1,0 +1,8 @@
+.listItem {
+    cursor: pointer;
+    transition: 0.32s;
+}
+
+.listItem:hover {
+    background: #EDF2F7;
+}
