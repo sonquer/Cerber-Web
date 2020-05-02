@@ -26,6 +26,7 @@ import {
     Button
 } from '@chakra-ui/core';
 import Editor from "@monaco-editor/react";
+import { Chart } from "react-google-charts";
 import styles from './Availability.module.css';
 
 class Availability extends Component<{match: any}, {isOpen: boolean, value: string}> {
@@ -62,18 +63,49 @@ class Availability extends Component<{match: any}, {isOpen: boolean, value: stri
                         <Tab>
                             <small>Status:</small>
                             &nbsp;
-                            <Badge variantColor="green">Ok</Badge></Tab>
-                        <Tab>
-                            Charts
+                            <Badge variantColor="green">Ok</Badge>
                         </Tab>
                     </TabList>
 
                     <TabPanels>
                         <TabPanel>
+                            <Chart
+                                chartType='AreaChart'
+                                data={[
+                                    ["Time", "Availability"],
+                                    ['16:00', 100],
+                                    ['16:01', 100],
+                                    ['16:02', 100],
+                                    ['16:03', 0],
+                                    ['16:04', 100]
+                                ]}
+                                width={'100%'}
+                                options={{
+                                    hAxis: {minValue: 0},
+                                    vAxis: {minValue:0},
+                                    colors: ['#38a169'],
+                                    backgroundColor: 'white',
+                                    legend: 'none',
+                                    animation: {
+                                        startup: true,
+                                        easing: 'linear',
+                                        duration: 512,
+                                    },
+                                    enableInteractivity: false,
+                                }} />
+                            <Divider/>
                             <List spacing={3} marginTop={5}>
                                 <ListItem onClick={() => this.onOpen('{}')} className={styles.listItem}>
                                     <ListIcon icon="check-circle" color="green.500" />
-                                    <small>[2020.04.01 16:00]</small> <Code>200 OK</Code> in <Code>31ms</Code>
+                                    <small>[2020.04.01 16:04]</small> <Code>200 OK</Code> in <Code>18ms</Code>
+                                </ListItem>
+                                <ListItem onClick={() => this.onOpen('{}')} className={styles.listItem}>
+                                    <ListIcon icon="warning" color="pink.500" />
+                                    <small>[2020.04.01 16:03]</small> <Code>500 Internal server error</Code> in <Code>7010ms</Code>
+                                </ListItem>
+                                <ListItem onClick={() => this.onOpen('{}')} className={styles.listItem}>
+                                    <ListIcon icon="check-circle" color="green.500" />
+                                    <small>[2020.04.01 16:02]</small> <Code>200 OK</Code> in <Code>43ms</Code>
                                 </ListItem>
                                 <ListItem onClick={() => this.onOpen('{}')} className={styles.listItem}>
                                     <ListIcon icon="check-circle" color="green.500" />
@@ -81,16 +113,9 @@ class Availability extends Component<{match: any}, {isOpen: boolean, value: stri
                                 </ListItem>
                                 <ListItem onClick={() => this.onOpen('{}')} className={styles.listItem}>
                                     <ListIcon icon="check-circle" color="green.500" />
-                                    <small>[2020.04.01 16:02]</small> <Code>200 OK</Code> in <Code>43ms</Code>
-                                </ListItem>
-                                <ListItem onClick={() => this.onOpen('{}')} className={styles.listItem}>
-                                    <ListIcon icon="warning" color="pink.500" />
-                                    <small>[2020.04.01 16:03]</small> <Code>500 Internal server error</Code> in <Code>7010ms</Code>
+                                    <small>[2020.04.01 16:00]</small> <Code>200 OK</Code> in <Code>31ms</Code>
                                 </ListItem>
                             </List>
-                        </TabPanel>
-                        <TabPanel>
-                            <p>Charts</p>
                         </TabPanel>
                     </TabPanels>
                 </Tabs>
@@ -109,7 +134,7 @@ class Availability extends Component<{match: any}, {isOpen: boolean, value: stri
                     </ModalBody>
 
                     <ModalFooter>
-                        <Button variantColor="teal" mr={3} onClick={this.onClose}>Close</Button>
+                        <Button variantColor="teal" mr={3} onClick={this.onClose} size="xs">Close</Button>
                     </ModalFooter>
                     </ModalContent>
                 </Modal>

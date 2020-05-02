@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Box, Grid, Image } from "@chakra-ui/core";
+import { Box, Grid, Image, Icon } from "@chakra-ui/core";
 import history from "../utils/history";
 
 interface IAvailabilityItemProps {
@@ -11,12 +11,12 @@ interface IAvailabilityItemProps {
 class AvailabilityItem extends Component<IAvailabilityItemProps, {}> {
     render() {
         return (
-            <Box w="100%" h="42px" bg="gray.100" p={1} border="1px #A0AEC0 solid" onClick={this.clicked}>
-                <Grid templateColumns="42px calc(100% - 42px)">
+            <Box w="100%" h="36px" bg="gray.100" p={1} border="1px #A0AEC0 solid" onClick={this.clicked}>
+                <Grid templateColumns="36px calc(100% - 36px)">
                     <Box w="100%" h="100%">
                         {this.props.IsAvailable 
-                        ? <Image size="32px" src="/img/ok.png" alt="ok.png" />
-                        : <Image size="32px" src="/img/error.png" alt="error.png" />}
+                        ? <Icon name="check-circle" color="green.500" size='24px'/>
+                        : <Icon name="warning" color="pink.500" size='24px' />}
                     </Box>
                     <Box w="100%" h="100%">
                         <p>

@@ -19,7 +19,8 @@ class Home extends Component {
                 <Divider />
                 <Box w="50%" margin="0 auto">
                     <Grid templateColumns="repeat(4, 1fr)" gap={6}>
-                        <AvailabilityItem Id='1' IsAvailable={true} />
+                        <AvailabilityItem Id='1' IsAvailable={true} Name='Search.Api' />
+                        <AvailabilityItem Id='2' IsAvailable={false} Name='Main.Api' />
                     </Grid>
                 </Box>
             </div>
