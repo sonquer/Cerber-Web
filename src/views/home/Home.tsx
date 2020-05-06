@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { RootState } from '../../app/store';
-import { Box, Grid, Heading, Divider, Image } from '@chakra-ui/core';
+import { Box, Grid, Heading, Divider, Image, Menu, MenuButton, Button, MenuList, MenuItem } from '@chakra-ui/core';
 import AvailabilityItem from '../../components/AvailabilityItem';
+import history from '../../utils/history';
 import styles from './Home.module.css';
 
 class Home extends Component {
@@ -17,6 +18,16 @@ class Home extends Component {
                     </small>
                 </Box>
                 <Divider />
+                <div style={{ width:'50%', margin:'0 auto', textAlign:'left', marginBottom:'18px', marginTop:'18px'}}>
+                    <Menu>
+                        <Button as={MenuButton} rightIcon="chevron-down" variantColor='gray'>
+                            Actions
+                        </Button>
+                        <MenuList>
+                            <MenuItem onClick={this.newAvailabilityItem}>Add new</MenuItem>
+                        </MenuList>
+                    </Menu>
+                </div>
                 <Box w="50%" margin="0 auto">
                     <Grid templateColumns="repeat(4, 1fr)" gap={6}>
                         <AvailabilityItem Id='1' IsAvailable={true} Name='Search.Api' />
@@ -25,6 +36,10 @@ class Home extends Component {
                 </Box>
             </div>
         );
+    }
+
+    newAvailabilityItem = () => {
+        history.push(`/configuration/create`);
     }
 }
 

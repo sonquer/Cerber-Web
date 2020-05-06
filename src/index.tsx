@@ -5,6 +5,7 @@ import App from './App';
 import Login from './views/login/Login';
 import Home from './views/home/Home';
 import Availability from './views/availability/Availability';
+import Configuration from './views/configuration/Configuration';
 import { store } from './app/store';
 import { Provider } from 'react-redux';
 import { Router, Route } from 'react-router-dom';
@@ -22,6 +23,7 @@ ReactDOM.render(
           <Route path="/home" component={Home} />
           <Route path="/login" component={Login} />
           <Route path="/availability/:id" component={Availability} />
+          <Route path="/configuration/:id" component={Configuration} />
         </Router>
       </Provider>
     </ThemeProvider>

@@ -1,5 +1,4 @@
-import { Component } from "react";
-import React from 'react';
+import React, { Component } from "react";
 import { connect } from 'react-redux';
 import styles from './Login.module.css';
 import { Formik, Field, FormikHelpers } from 'formik';
