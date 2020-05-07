@@ -64,14 +64,16 @@ class Availability extends Component<{match: any}, {isOpen: boolean, value: stri
                 </div>
                 <Divider/>
                 <div style={{textAlign:'left', width:'50%', margin:'0 auto'}}>
-                    <Menu>
-                        <Button as={MenuButton} rightIcon="chevron-down" variantColor='gray'>
-                            Actions
-                        </Button>
-                        <MenuList>
-                            <MenuItem onClick={() => this.editAvailabilityItem(params.id)}>Edit</MenuItem>
-                        </MenuList>
-                    </Menu>
+                    <div style={{marginBottom:'8px', marginTop:'8px'}}>
+                        <Menu>
+                            <Button as={MenuButton} rightIcon="chevron-down" variantColor='gray' size='xs'>
+                                Actions
+                            </Button>
+                            <MenuList>
+                                <MenuItem onClick={() => this.editAvailabilityItem(params.id)}>Edit</MenuItem>
+                            </MenuList>
+                        </Menu>
+                    </div>
                     <Tabs>
                         <TabList>
                             <Tab>

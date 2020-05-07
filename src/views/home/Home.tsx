@@ -18,22 +18,24 @@ class Home extends Component {
                     </small>
                 </Box>
                 <Divider />
-                <div style={{ width:'50%', margin:'0 auto', textAlign:'left', marginBottom:'18px', marginTop:'18px'}}>
-                    <Menu>
-                        <Button as={MenuButton} rightIcon="chevron-down" variantColor='gray'>
-                            Actions
-                        </Button>
-                        <MenuList>
-                            <MenuItem onClick={this.newAvailabilityItem}>Add new</MenuItem>
-                        </MenuList>
-                    </Menu>
+                <div style={{ width:'50%', margin:'0 auto', textAlign:'left'}}>
+                    <div style={{marginTop:'12px', marginBottom:'12px'}}>
+                        <Menu>
+                            <Button as={MenuButton} rightIcon="chevron-down" variantColor='gray' size='xs'>
+                                Actions
+                            </Button>
+                            <MenuList>
+                                <MenuItem onClick={this.newAvailabilityItem}>Add new</MenuItem>
+                            </MenuList>
+                        </Menu>
+                    </div>
+                    <Box>
+                        <Grid templateColumns="repeat(4, 1fr)" gap={6}>
+                            <AvailabilityItem Id='1' IsAvailable={true} Name='Search.Api' />
+                            <AvailabilityItem Id='2' IsAvailable={false} Name='Main.Api' />
+                        </Grid>
+                    </Box>
                 </div>
-                <Box w="50%" margin="0 auto">
-                    <Grid templateColumns="repeat(4, 1fr)" gap={6}>
-                        <AvailabilityItem Id='1' IsAvailable={true} Name='Search.Api' />
-                        <AvailabilityItem Id='2' IsAvailable={false} Name='Main.Api' />
-                    </Grid>
-                </Box>
             </div>
         );
     }
