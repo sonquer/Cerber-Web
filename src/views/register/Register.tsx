@@ -1,18 +1,18 @@
 import React, { Component } from "react";
 import { connect } from 'react-redux';
-import styles from './Login.module.css';
+import styles from './Register.module.css';
 import { Formik, Field, FormikHelpers } from 'formik';
+import { Box, Button, FormControl, FormLabel, Input, FormErrorMessage, Alert, AlertIcon, AlertTitle, AlertDescription } from "@chakra-ui/core"
 import { RootState } from "../../app/store";
 import { bindActionCreators } from "@reduxjs/toolkit";
-import { loginAsync } from '../../features/account/accountSlice';
-import { Box, Button, FormControl, FormLabel, Input, FormErrorMessage, Alert, AlertIcon, AlertTitle, AlertDescription } from "@chakra-ui/core"
+import { registerAsync } from '../../features/account/accountSlice';
 
-interface ILoginFormProperties {
+interface IRegisterFormProperties {
     name: string,
     password: string
 }
 
-interface ILoginForm {
+interface IRegisterForm {
     field: any,
     form: {
         errors: {
@@ -26,28 +26,28 @@ interface ILoginForm {
     }
 }
 
-interface ILoginProps {
-    loginAsync: any,
-    loginError: string | null
+interface IRegisterProps {
+    registerAsync: any,
+    registrationError: string | null
 }
 
-class Login extends Component<ILoginProps, {}> {
+class Register extends Component<IRegisterProps, {}> {
     render() {
         return (
             <div>
-                {this.props.loginError != null ? this.loginErrorWindow() : null}
-                <Box maxW="sm" borderWidth="1px" rounded="lg" overflow="hidden" className={styles.loginWindow}>
+                {this.props.registrationError != null ? this.registrationErrorWindow() : null}
+                <Box maxW="sm" borderWidth="1px" rounded="lg" overflow="hidden" className={styles.registerWindow}>
                     <Formik
-                        initialValues={{ name: '', password: '' } as ILoginFormProperties}
-                        onSubmit={async (values: ILoginFormProperties, actions: FormikHelpers<ILoginFormProperties>) => {
-                            const { loginAsync } = this.props;
-                            await loginAsync();
+                        initialValues={{ name: '', password: '' } as IRegisterFormProperties}
+                        onSubmit={async (values: IRegisterFormProperties, actions: FormikHelpers<IRegisterFormProperties>) => {
+                            const { registerAsync } = this.props;
+                            await registerAsync();
                             actions.setSubmitting(false);
                         }}>
                         {(props: any) => (
                             <form onSubmit={props.handleSubmit}>
                             <Field name="name">
-                                {({ field, form }: ILoginForm) => (
+                                {({ field, form }: IRegisterForm) => (
                                     <FormControl isInvalid={form.errors.name && form.touched.name}>
                                         <FormLabel htmlFor="name">Login</FormLabel>
                                         <Input {...field} id="name" placeholder="name" />
@@ -56,7 +56,7 @@ class Login extends Component<ILoginProps, {}> {
                                 )}
                             </Field>
                             <Field name="password">
-                                {({ field, form }: ILoginForm) => (
+                                {({ field, form }: IRegisterForm) => (
                                     <FormControl isInvalid={form.errors.password && form.touched.password}>
                                         <FormLabel htmlFor="password">Password</FormLabel>
                                         <Input {...field} id="password" placeholder="password" type="password" />
@@ -69,7 +69,7 @@ class Login extends Component<ILoginProps, {}> {
                                 variantColor="teal"
                                 isLoading={props.isSubmitting}
                                 type="submit">
-                                Submit
+                                Create account
                             </Button>
                             </form>
                         )}
@@ -79,14 +79,14 @@ class Login extends Component<ILoginProps, {}> {
         );
     }
 
-    loginErrorWindow() {
-        const { loginError } = this.props;
+    registrationErrorWindow() {
+        const { registrationError } = this.props;
 
         return (
             <Alert status="error">
                 <AlertIcon />
                 <AlertTitle mr={2}>Error!</AlertTitle>
-                <AlertDescription>{loginError}</AlertDescription>
+                <AlertDescription>{registrationError}</AlertDescription>
             </Alert>
         );
     }
@@ -94,13 +94,14 @@ class Login extends Component<ILoginProps, {}> {
 
 const mapStateToProps = (state: RootState) => {
     return {
-        token: state.account.token,
-        loginError: state.account.loginError
+        registrationError: state.account.registrationError
     }
 }
 
 const mapDispatchToProps = (dispatch: any) => {
-    return bindActionCreators({ loginAsync }, dispatch)
+    return bindActionCreators({
+        registerAsync
+    }, dispatch)
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Login)
+export default connect(mapStateToProps, mapDispatchToProps)(Register)
