@@ -34,8 +34,24 @@ import Editor from "@monaco-editor/react";
 import { Chart } from "react-google-charts";
 import styles from './Availability.module.css';
 
-class Availability extends Component<{match: any}, {isOpen: boolean, value: string}> {
-    constructor(props: {match: any}) {
+interface IAvailabilityProps {
+    id: string | null,
+    name: string | null,
+    url: string | null,
+    expectedStatusCode: number | null,
+    expectedResponse: string | null,
+    availabilityLogs: {    
+        createdAt: string,
+        statusCode: number,
+        body: string,
+        responseTime: number
+    }[],
+    match: any,
+    status: 'ST_OK' | 'ST_ERROR'
+}
+
+class Availability extends Component<IAvailabilityProps, {isOpen: boolean, value: string}> {
+    constructor(props: IAvailabilityProps) {
         super(props);
 
         this.state = {
@@ -48,19 +64,25 @@ class Availability extends Component<{match: any}, {isOpen: boolean, value: stri
         const { match } = this.props;
         const { params } = match;
 
+        const {
+            url,
+            availabilityLogs,
+            status
+        } = this.props;
+
         return (
             <div style={{textAlign:'center'}}>
                 <div style={{margin:10}}>
                     <Breadcrumb>
                         <BreadcrumbItem>
-                            <BreadcrumbLink href="/home">Home</BreadcrumbLink>
+                            <BreadcrumbLink href="/">Home</BreadcrumbLink>
                         </BreadcrumbItem>
 
                         <BreadcrumbItem isCurrentPage>
                             <BreadcrumbLink href="#">{params.id}</BreadcrumbLink>
                         </BreadcrumbItem>
                     </Breadcrumb>
-                    <Code margin={2}>http://google.com/</Code>
+                <Code margin={2}>{url}</Code>
                 </div>
                 <Divider/>
                 <div style={{textAlign:'left', width:'50%', margin:'0 auto'}}>
@@ -79,7 +101,7 @@ class Availability extends Component<{match: any}, {isOpen: boolean, value: stri
                             <Tab>
                                 <small>Status:</small>
                                 &nbsp;
-                                <Badge variantColor="green">Ok</Badge>
+                                {status === 'ST_OK' ? <Badge variantColor="green">Ok</Badge> : <Badge variantColor="red">Error</Badge>}
                             </Tab>
                         </TabList>
                         <TabPanels>
@@ -110,26 +132,14 @@ class Availability extends Component<{match: any}, {isOpen: boolean, value: stri
                                     }} />
                                 <Divider/>
                                 <List spacing={3} marginTop={5}>
-                                    <ListItem onClick={() => this.onOpen('{}')} className={styles.listItem}>
-                                        <ListIcon icon="check-circle" color="green.500" />
-                                        <small>[2020.04.01 16:04]</small> <Code>200 OK</Code> in <Code>18ms</Code>
-                                    </ListItem>
-                                    <ListItem onClick={() => this.onOpen('{}')} className={styles.listItem}>
-                                        <ListIcon icon="warning" color="pink.500" />
-                                        <small>[2020.04.01 16:03]</small> <Code>500 Internal server error</Code> in <Code>7010ms</Code>
-                                    </ListItem>
-                                    <ListItem onClick={() => this.onOpen('{}')} className={styles.listItem}>
-                                        <ListIcon icon="check-circle" color="green.500" />
-                                        <small>[2020.04.01 16:02]</small> <Code>200 OK</Code> in <Code>43ms</Code>
-                                    </ListItem>
-                                    <ListItem onClick={() => this.onOpen('{}')} className={styles.listItem}>
-                                        <ListIcon icon="check-circle" color="green.500" />
-                                        <small>[2020.04.01 16:01]</small> <Code>200 OK</Code> in <Code>11ms</Code>
-                                    </ListItem>
-                                    <ListItem onClick={() => this.onOpen('{}')} className={styles.listItem}>
-                                        <ListIcon icon="check-circle" color="green.500" />
-                                        <small>[2020.04.01 16:00]</small> <Code>200 OK</Code> in <Code>31ms</Code>
-                                    </ListItem>
+                                    {availabilityLogs.map(log => (
+                                        <ListItem onClick={() => this.onOpen(log.body)} className={styles.listItem}>
+                                            {log.statusCode.toString()[0] === '2' 
+                                                ? <ListIcon icon="check-circle" color="green.500" /> 
+                                                : <ListIcon icon="check-circle" color="pink.500" />}
+                                            <small>[{log.createdAt}]</small> <Code>{log.statusCode}</Code> in <Code>{log.responseTime}ms</Code>
+                                        </ListItem>
+                                    ))}
                                 </List>
                             </TabPanel>
                         </TabPanels>
@@ -172,7 +182,15 @@ class Availability extends Component<{match: any}, {isOpen: boolean, value: stri
 }
 
 const mapStateToProps = (state: RootState) => {
-    return {}
+    return {
+        id: state.availiability.id,
+        name: state.availiability.name,
+        url: state.availiability.url,
+        expectedStatusCode: state.availiability.expectedStatusCode,
+        expectedResponse: state.availiability.expectedResponse,
+        availabilityLogs: state.availiability.availabilityLogs,
+        status: state.availiability.status
+    }
 }
 
 const mapDispatchToProps = (dispatch: any) => {

@@ -1,11 +1,13 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 import counterReducer from '../features/counter/counterSlice';
 import accountReducer from '../features/account/accountSlice';
+import availabilityReducer from '../features/availability/availabilitySlice';
 
 export const store = configureStore({
   reducer: {
     account: accountReducer,
-    counter: counterReducer
+    counter: counterReducer,
+    availiability: availabilityReducer
   },
 });
 
