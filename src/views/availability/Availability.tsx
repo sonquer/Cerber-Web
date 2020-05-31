@@ -2,19 +2,19 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { RootState } from '../../app/store';
 import { 
-    Code, 
-    Divider, 
-    Badge, 
-    Breadcrumb, 
-    BreadcrumbItem, 
-    BreadcrumbLink, 
-    List, 
-    ListItem, 
+    Code,
+    Divider,
+    Badge,
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    List,
+    ListItem,
     ListIcon,
-    Tabs, 
+    Tabs,
     TabPanels,
     TabList,
-    TabPanel, 
+    TabPanel,
     Tab,
     Modal,
     ModalBody,
@@ -41,7 +41,7 @@ interface IAvailabilityProps {
     expectedStatusCode: number | null,
     expectedResponse: string | null,
     availabilityLogs: {    
-        createdAt: string,
+        createdAt: Date,
         statusCode: number,
         body: string,
         responseTime: number
@@ -50,13 +50,14 @@ interface IAvailabilityProps {
     status: 'ST_OK' | 'ST_ERROR'
 }
 
-class Availability extends Component<IAvailabilityProps, {isOpen: boolean, value: string}> {
+class Availability extends Component<IAvailabilityProps, {isOpen: boolean, value: string, statusCode: number}> {
     constructor(props: IAvailabilityProps) {
         super(props);
 
         this.state = {
             isOpen: false,
-            value: ''
+            value: '',
+            statusCode: 0
         };
     }
 
@@ -67,6 +68,8 @@ class Availability extends Component<IAvailabilityProps, {isOpen: boolean, value
         const {
             url,
             availabilityLogs,
+            expectedStatusCode,
+            expectedResponse,
             status
         } = this.props;
 
@@ -108,14 +111,7 @@ class Availability extends Component<IAvailabilityProps, {isOpen: boolean, value
                             <TabPanel>
                                 <Chart
                                     chartType='AreaChart'
-                                    data={[
-                                        ["Time", "Availability"],
-                                        ['16:00', 100],
-                                        ['16:01', 100],
-                                        ['16:02', 100],
-                                        ['16:03', 0],
-                                        ['16:04', 100]
-                                    ]}
+                                    data={this.chartLogs()}
                                     width={'100%'}
                                     options={{
                                         hAxis: {minValue: 0},
@@ -133,11 +129,11 @@ class Availability extends Component<IAvailabilityProps, {isOpen: boolean, value
                                 <Divider/>
                                 <List spacing={3} marginTop={5}>
                                     {availabilityLogs.map(log => (
-                                        <ListItem onClick={() => this.onOpen(log.body)} className={styles.listItem}>
-                                            {log.statusCode.toString()[0] === '2' 
+                                        <ListItem onClick={() => this.onOpen(log.body, log.statusCode)} className={styles.listItem}>
+                                            {log.statusCode === expectedStatusCode || log.body !== expectedResponse
                                                 ? <ListIcon icon="check-circle" color="green.500" /> 
                                                 : <ListIcon icon="check-circle" color="pink.500" />}
-                                            <small>[{log.createdAt}]</small> <Code>{log.statusCode}</Code> in <Code>{log.responseTime}ms</Code>
+                                            <small>[{log.createdAt.toUTCString()}]</small> <Code>{log.statusCode}</Code> in <Code>{log.responseTime}ms</Code>
                                         </ListItem>
                                     ))}
                                 </List>
@@ -149,7 +145,7 @@ class Availability extends Component<IAvailabilityProps, {isOpen: boolean, value
                     <ModalOverlay />
                     <ModalContent>
                     <ModalHeader>
-                        <Code>500 Internal server error</Code>
+                        <Code>{this.state.statusCode}</Code>
                     </ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
@@ -168,16 +164,31 @@ class Availability extends Component<IAvailabilityProps, {isOpen: boolean, value
         );
     }
 
+    chartLogs = () : Array<[string, string | number]> => {
+        let data : Array<[string, string | number]> = [['Time', 'Availability']];
+
+        const { availabilityLogs, expectedResponse, expectedStatusCode } = this.props;
+
+        availabilityLogs?.slice(0, 10)?.map(log => {
+            let hours = log.createdAt.getHours();
+            let minutes = log.createdAt.getMinutes();
+            
+            data.push([`${hours}:${minutes}`, log.statusCode !== expectedStatusCode || log.body !== expectedResponse ? 0 : 100])
+        });
+
+        return data;
+    }
+
     editAvailabilityItem = (id: string) => {
         history.push(`/configuration/${id}`);
     }
 
-    onOpen = (value: string) => {
-        this.setState({isOpen: true, value: value});
+    onOpen = (value: string, statusCode: number) => {
+        this.setState({isOpen: true, value: value, statusCode: statusCode});
     }
 
     onClose = () => {
-        this.setState({isOpen: false, value: ''});
+        this.setState({isOpen: false, value: '', statusCode: 0});
     }
 }
 

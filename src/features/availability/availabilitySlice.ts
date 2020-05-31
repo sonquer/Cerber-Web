@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 interface IAvailabilityLog {
-    createdAt: string,
+    createdAt: Date,
     statusCode: number,
     body: string,
     responseTime: number
@@ -25,7 +25,19 @@ const initialState: AvailabilityState = {
     expectedResponse: '',
     availabilityLogs: [
         {
-            createdAt: '2020-04-01T19:48:09.155987Z',
+            createdAt: new Date(Date.parse('2020-04-01T19:31:09.155987Z')),
+            statusCode: 200,
+            body: '',
+            responseTime: 30
+        },
+        {
+            createdAt: new Date(Date.parse('2020-04-01T19:42:09.155987Z')),
+            statusCode: 500,
+            body: '',
+            responseTime: 30
+        },
+        {
+            createdAt: new Date(Date.parse('2020-04-01T19:52:09.155987Z')),
             statusCode: 200,
             body: '',
             responseTime: 30
