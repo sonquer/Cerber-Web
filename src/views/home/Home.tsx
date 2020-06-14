@@ -5,11 +5,13 @@ import { Box, Grid, Heading, Divider, Image, Menu, MenuButton, Button, MenuList,
 import AvailabilityItem from '../../components/AvailabilityItem';
 import history from '../../utils/history';
 import styles from './Home.module.css';
+import Header from '../../components/Header';
 
 class Home extends Component {
     render() {
         return (
             <div style={{textAlign:'center'}}>
+                <Header />
                 <Box p={5}>
                     <Image size="64px" src="/img/health-ok.svg" className={styles.imageCenter}/>
                     <Heading as="h3" size="lg" marginTop={10}>Everything is looking good</Heading>

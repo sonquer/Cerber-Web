@@ -6,6 +6,7 @@ import { Box, Button, FormControl, FormLabel, Input, FormErrorMessage, Alert, Al
 import { RootState } from "../../app/store";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import { registerAsync } from '../../features/account/accountSlice';
+import Header from "../../components/Header";
 
 interface IRegisterFormProperties {
     name: string,
@@ -35,6 +36,7 @@ class Register extends Component<IRegisterProps, {}> {
     render() {
         return (
             <div>
+                <Header />
                 {this.props.registrationError != null ? this.registrationErrorWindow() : null}
                 <Box maxW="sm" borderWidth="1px" rounded="lg" overflow="hidden" className={styles.registerWindow}>
                     <Formik

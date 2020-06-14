@@ -6,6 +6,7 @@ import { RootState } from "../../app/store";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import { loginAsync } from '../../features/account/accountSlice';
 import { Box, Button, FormControl, FormLabel, Input, FormErrorMessage, Alert, AlertIcon, AlertTitle, AlertDescription } from "@chakra-ui/core"
+import Header from "../../components/Header";
 
 interface ILoginFormProperties {
     name: string,
@@ -35,6 +36,7 @@ class Login extends Component<ILoginProps, {}> {
     render() {
         return (
             <div>
+                <Header />
                 {this.props.loginError != null ? this.loginErrorWindow() : null}
                 <Box maxW="sm" borderWidth="1px" rounded="lg" overflow="hidden" className={styles.loginWindow}>
                     <Formik

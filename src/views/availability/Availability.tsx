@@ -33,6 +33,7 @@ import history from '../../utils/history';
 import Editor from "@monaco-editor/react";
 import { Chart } from "react-google-charts";
 import styles from './Availability.module.css';
+import Header from '../../components/Header';
 
 interface IAvailabilityProps {
     id: string | null,
@@ -75,6 +76,7 @@ class Availability extends Component<IAvailabilityProps, {isOpen: boolean, value
 
         return (
             <div style={{textAlign:'center'}}>
+                <Header />
                 <div style={{margin:10}}>
                     <Breadcrumb>
                         <BreadcrumbItem>
