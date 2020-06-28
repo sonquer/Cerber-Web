@@ -1,14 +1,23 @@
-import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
+import { configureStore, ThunkAction, Action, getDefaultMiddleware, combineReducers } from '@reduxjs/toolkit';
 import counterReducer from '../features/counter/counterSlice';
 import accountReducer from '../features/account/accountSlice';
 import availabilityReducer from '../features/availability/availabilitySlice';
+import { createBrowserHistory } from 'history'
+import { connectRouter, routerMiddleware } from 'connected-react-router'
+
+export const history = createBrowserHistory()
+
+const middleware = [...getDefaultMiddleware(), routerMiddleware(history)];
 
 export const store = configureStore({
-  reducer: {
+  reducer: combineReducers({
+    router: connectRouter(history),
     account: accountReducer,
     counter: counterReducer,
     availiability: availabilityReducer
-  },
+  }),
+  middleware: middleware,
+  devTools: process.env.NODE_ENV !== 'production'
 });
 
 export type RootState = ReturnType<typeof store.getState>;

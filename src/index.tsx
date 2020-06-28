@@ -5,12 +5,11 @@ import Register from './views/register/Register';
 import Home from './views/home/Home';
 import Availability from './views/availability/Availability';
 import Configuration from './views/configuration/Configuration';
-import { store } from './app/store';
+import { store, history } from './app/store';
 import { Provider } from 'react-redux';
 import { Router, Route } from 'react-router-dom';
 import * as serviceWorker from './serviceWorker';
 import { ThemeProvider, CSSReset } from "@chakra-ui/core";
-import history from "./utils/history";
 import './index.css';
 
 ReactDOM.render(

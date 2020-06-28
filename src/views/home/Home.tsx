@@ -3,14 +3,22 @@ import { connect } from 'react-redux'
 import { RootState } from '../../app/store';
 import { Box, Grid, Heading, Divider, Image, Menu, MenuButton, Button, MenuList, MenuItem } from '@chakra-ui/core';
 import AvailabilityItem from '../../components/AvailabilityItem';
-import history from '../../utils/history';
 import styles from './Home.module.css';
 import Header from '../../components/Header';
+import { push } from 'connected-react-router';
+import { bindActionCreators } from '@reduxjs/toolkit';
+import Authentication from '../../components/Authentication';
 
-class Home extends Component {
+interface IHomeProps {
+    push: (path: string) => void,
+    token: string | null
+}
+
+class Home extends Component<IHomeProps> {
     render() {
         return (
             <div style={{textAlign:'center'}}>
+                <Authentication />
                 <Header />
                 <Box p={5}>
                     <Image size="64px" src="/img/health-ok.svg" className={styles.imageCenter}/>
@@ -33,8 +41,8 @@ class Home extends Component {
                     </div>
                     <Box>
                         <Grid templateColumns="repeat(4, 1fr)" gap={6}>
-                            <AvailabilityItem Id='1' IsAvailable={true} Name='Search.Api' />
-                            <AvailabilityItem Id='2' IsAvailable={false} Name='Main.Api' />
+                            <AvailabilityItem Id='1' IsAvailable={true} Name='Search.Api' Navigation={this.props.push} />
+                            <AvailabilityItem Id='2' IsAvailable={false} Name='Main.Api' Navigation={this.props.push} />
                         </Grid>
                     </Box>
                 </div>
@@ -43,7 +51,7 @@ class Home extends Component {
     }
 
     newAvailabilityItem = () => {
-        history.push(`/configuration/create`);
+        this.props.push(`/configuration/create`);
     }
 }
 
@@ -51,8 +59,9 @@ const mapStateToProps = (state: RootState) => {
     return {}
 }
 
+
 const mapDispatchToProps = (dispatch: any) => {
-    return {}
+    return bindActionCreators({ push }, dispatch)
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import { Box, Grid, Icon, Button } from "@chakra-ui/core";
-import history from "../utils/history";
 
 interface IAvailabilityItemProps {
     Id: string;
     IsAvailable: boolean;
     Name?: string;
+    Navigation: (path: string) => void
 }
 
 class AvailabilityItem extends Component<IAvailabilityItemProps, {}> {
@@ -29,7 +29,7 @@ class AvailabilityItem extends Component<IAvailabilityItemProps, {}> {
     }
 
     clicked = () => {
-        history.push(`/availability/${this.props.Id}`);
+        this.props.Navigation(`/availability/${this.props.Id}`);
     }
 }
 

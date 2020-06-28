@@ -22,6 +22,7 @@ import {
 } from '../../features/availability/availabilitySlice';
 import { ControlledEditor } from "@monaco-editor/react";
 import Header from '../../components/Header';
+import Authentication from "../../components/Authentication";
 
 interface IConfigurationParams {
     match: any;
@@ -52,6 +53,7 @@ class Configuration extends Component<IConfigurationParams, {}> {
     render() {
         return (
             <Stack>
+                <Authentication />
                 <Header />
                 <Breadcrumb style={{textAlign:'center', marginTop: 10}}>
                     <BreadcrumbItem>

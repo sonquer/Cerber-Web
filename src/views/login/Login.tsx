@@ -4,12 +4,25 @@ import styles from './Login.module.css';
 import { Formik, Field, FormikHelpers } from 'formik';
 import { RootState } from "../../app/store";
 import { bindActionCreators } from "@reduxjs/toolkit";
-import { loginAsync } from '../../features/account/accountSlice';
-import { Box, Button, FormControl, FormLabel, Input, FormErrorMessage, Alert, AlertIcon, AlertTitle, AlertDescription } from "@chakra-ui/core"
+import { loginAsync, rememberMeOnChange } from '../../features/account/accountSlice';
+import { 
+    Box, 
+    Button, 
+    FormControl, 
+    FormLabel, 
+    Input, 
+    FormErrorMessage, 
+    Alert, 
+    AlertIcon, 
+    AlertTitle, 
+    AlertDescription, 
+    Checkbox
+} from "@chakra-ui/core"
 import Header from "../../components/Header";
+import { Redirect } from "react-router-dom";
 
 interface ILoginFormProperties {
-    name: string,
+    email: string,
     password: string
 }
 
@@ -17,43 +30,46 @@ interface ILoginForm {
     field: any,
     form: {
         errors: {
-            name: boolean,
+            email: boolean,
             password: boolean
         },
         touched: {
-            name: boolean,
+            email: boolean,
             password: boolean
         }
     }
 }
 
 interface ILoginProps {
-    loginAsync: any,
-    loginError: string | null
+    rememberMeOnChange: (value: boolean) => void,
+    loginAsync: (email: string, password: string) => void,
+    loginError: string | null,
+    loginCompleted: boolean
 }
 
 class Login extends Component<ILoginProps, {}> {
     render() {
         return (
             <div>
+                {this.props.loginCompleted ? <Redirect to="/" /> : null}
                 <Header />
                 {this.props.loginError != null ? this.loginErrorWindow() : null}
                 <Box maxW="sm" borderWidth="1px" rounded="lg" overflow="hidden" className={styles.loginWindow}>
                     <Formik
-                        initialValues={{ name: '', password: '' } as ILoginFormProperties}
+                        initialValues={{ email: '', password: '' } as ILoginFormProperties}
                         onSubmit={async (values: ILoginFormProperties, actions: FormikHelpers<ILoginFormProperties>) => {
                             const { loginAsync } = this.props;
-                            await loginAsync();
+                            await loginAsync(values.email, values.password);
                             actions.setSubmitting(false);
                         }}>
                         {(props: any) => (
                             <form onSubmit={props.handleSubmit}>
-                            <Field name="name">
+                            <Field name="email">
                                 {({ field, form }: ILoginForm) => (
-                                    <FormControl isInvalid={form.errors.name && form.touched.name}>
-                                        <FormLabel htmlFor="name">Login</FormLabel>
-                                        <Input {...field} id="name" placeholder="name" />
-                                        <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                                    <FormControl isInvalid={form.errors.email && form.touched.email}>
+                                        <FormLabel htmlFor="email">Email</FormLabel>
+                                        <Input {...field} id="email" placeholder="email" tyle='email' />
+                                        <FormErrorMessage>{form.errors.email}</FormErrorMessage>
                                     </FormControl>
                                 )}
                             </Field>
@@ -66,12 +82,17 @@ class Login extends Component<ILoginProps, {}> {
                                     </FormControl>
                                 )}
                             </Field>
+                            <Box mt={2}>
+                                <Checkbox variantColor="green" onChange={(ev: React.ChangeEvent<HTMLInputElement>) => {
+                                    this.props.rememberMeOnChange(ev.target.checked);
+                                }}>Remember me</Checkbox>
+                            </Box>
                             <Button
-                                mt={4}
+                                mt={2}
                                 variantColor="teal"
                                 isLoading={props.isSubmitting}
                                 type="submit">
-                                Submit
+                                Login
                             </Button>
                             </form>
                         )}
@@ -97,12 +118,16 @@ class Login extends Component<ILoginProps, {}> {
 const mapStateToProps = (state: RootState) => {
     return {
         token: state.account.token,
-        loginError: state.account.loginError
+        loginError: state.account.loginError,
+        loginCompleted: state.account.loginCompleted
     }
 }
 
 const mapDispatchToProps = (dispatch: any) => {
-    return bindActionCreators({ loginAsync }, dispatch)
+    return bindActionCreators({ 
+        loginAsync,
+        rememberMeOnChange
+    }, dispatch)
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login)

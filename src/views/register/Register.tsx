@@ -7,9 +7,10 @@ import { RootState } from "../../app/store";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import { registerAsync } from '../../features/account/accountSlice';
 import Header from "../../components/Header";
+import { Redirect } from "react-router-dom";
 
 interface IRegisterFormProperties {
-    name: string,
+    email: string,
     password: string
 }
 
@@ -17,43 +18,45 @@ interface IRegisterForm {
     field: any,
     form: {
         errors: {
-            name: boolean,
+            email: boolean,
             password: boolean
         },
         touched: {
-            name: boolean,
+            email: boolean,
             password: boolean
         }
     }
 }
 
 interface IRegisterProps {
-    registerAsync: any,
-    registrationError: string | null
+    registerAsync: (email: string, password: string) => void,
+    registrationError: string | null,
+    registrationCompleted: boolean
 }
 
 class Register extends Component<IRegisterProps, {}> {
     render() {
         return (
             <div>
+                {this.props.registrationCompleted ? <Redirect to="/login" /> : null}
                 <Header />
                 {this.props.registrationError != null ? this.registrationErrorWindow() : null}
                 <Box maxW="sm" borderWidth="1px" rounded="lg" overflow="hidden" className={styles.registerWindow}>
                     <Formik
-                        initialValues={{ name: '', password: '' } as IRegisterFormProperties}
+                        initialValues={{ email: '', password: '' } as IRegisterFormProperties}
                         onSubmit={async (values: IRegisterFormProperties, actions: FormikHelpers<IRegisterFormProperties>) => {
                             const { registerAsync } = this.props;
-                            await registerAsync();
+                            await registerAsync(values.email, values.password);
                             actions.setSubmitting(false);
                         }}>
                         {(props: any) => (
                             <form onSubmit={props.handleSubmit}>
-                            <Field name="name">
+                            <Field name="email">
                                 {({ field, form }: IRegisterForm) => (
-                                    <FormControl isInvalid={form.errors.name && form.touched.name}>
-                                        <FormLabel htmlFor="name">Login</FormLabel>
-                                        <Input {...field} id="name" placeholder="name" />
-                                        <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                                    <FormControl isInvalid={form.errors.email && form.touched.email}>
+                                        <FormLabel htmlFor="email">Email</FormLabel>
+                                        <Input {...field} id="email" placeholder="email" type="email" />
+                                        <FormErrorMessage>{form.errors.email}</FormErrorMessage>
                                     </FormControl>
                                 )}
                             </Field>
@@ -96,7 +99,8 @@ class Register extends Component<IRegisterProps, {}> {
 
 const mapStateToProps = (state: RootState) => {
     return {
-        registrationError: state.account.registrationError
+        registrationError: state.account.registrationError,
+        registrationCompleted: state.account.registrationCompleted
     }
 }
 

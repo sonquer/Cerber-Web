@@ -29,11 +29,13 @@ import {
     MenuButton,
     MenuItem
 } from '@chakra-ui/core';
-import history from '../../utils/history';
 import Editor from "@monaco-editor/react";
 import { Chart } from "react-google-charts";
+import { push } from 'connected-react-router';
 import styles from './Availability.module.css';
 import Header from '../../components/Header';
+import { bindActionCreators } from '@reduxjs/toolkit';
+import Authentication from '../../components/Authentication';
 
 interface IAvailabilityProps {
     id: string | null,
@@ -48,7 +50,8 @@ interface IAvailabilityProps {
         responseTime: number
     }[],
     match: any,
-    status: 'ST_OK' | 'ST_ERROR'
+    status: 'ST_OK' | 'ST_ERROR',
+    push: (path: string) => void
 }
 
 class Availability extends Component<IAvailabilityProps, {isOpen: boolean, value: string, statusCode: number}> {
@@ -76,6 +79,7 @@ class Availability extends Component<IAvailabilityProps, {isOpen: boolean, value
 
         return (
             <div style={{textAlign:'center'}}>
+                <Authentication />
                 <Header />
                 <div style={{margin:10}}>
                     <Breadcrumb>
@@ -182,7 +186,7 @@ class Availability extends Component<IAvailabilityProps, {isOpen: boolean, value
     }
 
     editAvailabilityItem = (id: string) => {
-        history.push(`/configuration/${id}`);
+        this.props.push(`/configuration/${id}`);
     }
 
     onOpen = (value: string, statusCode: number) => {
@@ -207,7 +211,7 @@ const mapStateToProps = (state: RootState) => {
 }
 
 const mapDispatchToProps = (dispatch: any) => {
-    return {}
+    return bindActionCreators({ push }, dispatch)
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Availability)
