@@ -2,6 +2,7 @@ import { configureStore, ThunkAction, Action, getDefaultMiddleware, combineReduc
 import counterReducer from '../features/counter/counterSlice';
 import accountReducer from '../features/account/accountSlice';
 import availabilityReducer from '../features/availability/availabilitySlice';
+import availabilityListReducer from '../features/availabilityList/availabilityListSlice';
 import { createBrowserHistory } from 'history'
 import { connectRouter, routerMiddleware } from 'connected-react-router'
 
@@ -14,6 +15,7 @@ export const store = configureStore({
     router: connectRouter(history),
     account: accountReducer,
     counter: counterReducer,
+    availabilityList: availabilityListReducer,
     availiability: availabilityReducer
   }),
   middleware: middleware,
