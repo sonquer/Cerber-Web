@@ -20,7 +20,7 @@ class AvailabilityItem extends Component<IAvailabilityItemProps, {}> {
                     </Box>
                     <Box w="100%" h="100%" justifyContent='center' display='flex' alignItems='center'>
                         <p>
-                            {this.props.Name || 'unknown?'}
+                            {this.props.Name || '???'}
                         </p>
                     </Box>
                 </Grid>

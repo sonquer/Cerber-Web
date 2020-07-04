@@ -69,7 +69,12 @@ class Home extends Component<IHomeProps> {
         return (
             <Grid templateColumns="repeat(4, 1fr)" gap={6}>
                 {this.props.availabilityItems.map(item => (
-                    <AvailabilityItem Id={item.id} IsAvailable={item.status === 'ST_OK'} Name={item.name} Navigation={this.props.push} />
+                    <AvailabilityItem 
+                        key={item.id}
+                        Id={item.id} 
+                        IsAvailable={item.status === 'ST_OK'} 
+                        Name={item.name} 
+                        Navigation={this.props.push} />
                 ))}
             </Grid>
         );

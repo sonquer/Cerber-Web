@@ -1,7 +1,9 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
+import { AppThunk } from '../../app/store';
 
 interface IAvailabilityLog {
-    createdAt: Date,
+    createdAt: string,
     statusCode: number,
     body: string,
     responseTime: number
@@ -14,37 +16,33 @@ interface AvailabilityState {
     expectedStatusCode: number,
     expectedResponse: string | null,
     availabilityLogs: IAvailabilityLog[],
-    status: 'ST_ERROR' | 'ST_OK'
+    status: 'ST_ERROR' | 'ST_OK',
+    loading: boolean
 }
 
 const initialState: AvailabilityState = {
-    id: '1234',
-    name: 'test',
-    url: 'http://google.com',
+    id: '',
+    name: '',
+    url: '',
     expectedStatusCode: 200,
     expectedResponse: '{}',
-    availabilityLogs: [
-        {
-            createdAt: new Date(Date.parse('2020-04-01T19:31:09.155987Z')),
-            statusCode: 200,
-            body: '',
-            responseTime: 30
-        },
-        {
-            createdAt: new Date(Date.parse('2020-04-01T19:42:09.155987Z')),
-            statusCode: 500,
-            body: '',
-            responseTime: 30
-        },
-        {
-            createdAt: new Date(Date.parse('2020-04-01T19:52:09.155987Z')),
-            statusCode: 200,
-            body: '',
-            responseTime: 30
-        }
-    ],
-    status: 'ST_OK'
+    availabilityLogs: [],
+    status: 'ST_OK',
+    loading: true
 };
+
+const load = createAsyncThunk<AvailabilityState, {id: string, token: string}>(
+    'availability/load',
+    async (args) => {
+        const response = await axios.get(`https://cluster.cerber.space/gateway/availability/api/Availability/${args.id}`, {
+            headers: {
+                Authorization: `Bearer ${args.token}`
+            }
+        });
+
+        return response.data
+    }
+)
 
 export const availabilitySlice = createSlice({
     name: 'availability',
@@ -71,8 +69,38 @@ export const availabilitySlice = createSlice({
             state.expectedResponse = action.payload;
         },
     },
-    extraReducers: {}
+    extraReducers: {
+        [load.fulfilled.type]: (state, action : PayloadAction<AvailabilityState>) => {
+            state.id = action.payload.id;
+            state.name = action.payload.name;
+            state.expectedResponse = action.payload.expectedResponse;
+            state.expectedStatusCode = action.payload.expectedStatusCode;
+            state.status = action.payload.status;
+            state.url = action.payload.url;
+
+            let logs : IAvailabilityLog[] = [];
+            action.payload.availabilityLogs?.map(e => {
+                logs.push({
+                    body: e.body,
+                    createdAt: e.createdAt,
+                    responseTime: e.responseTime,
+                    statusCode: e.statusCode
+                });
+            });
+
+            state.availabilityLogs = logs;
+
+            state.loading = false;
+        },
+        [load.rejected.type]: (state, action : PayloadAction<AvailabilityState>) => {
+            state.loading = false;
+        }
+    }
 });
+
+export const loadAsync = (id: string, token: string): AppThunk => dispatch => {
+    dispatch(load({id, token}));
+};
 
 export const { 
     createNew,

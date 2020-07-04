@@ -27,7 +27,8 @@ import {
     Menu,
     MenuList,
     MenuButton,
-    MenuItem
+    MenuItem,
+    CircularProgress
 } from '@chakra-ui/core';
 import Editor from "@monaco-editor/react";
 import { Chart } from "react-google-charts";
@@ -36,6 +37,7 @@ import styles from './Availability.module.css';
 import Header from '../../components/Header';
 import { bindActionCreators } from '@reduxjs/toolkit';
 import Authentication from '../../components/Authentication';
+import { loadAsync } from '../../features/availability/availabilitySlice';
 
 interface IAvailabilityProps {
     id: string | null,
@@ -44,14 +46,17 @@ interface IAvailabilityProps {
     expectedStatusCode: number | null,
     expectedResponse: string | null,
     availabilityLogs: {    
-        createdAt: Date,
+        createdAt: string,
         statusCode: number,
         body: string,
         responseTime: number
     }[],
     match: any,
     status: 'ST_OK' | 'ST_ERROR',
-    push: (path: string) => void
+    push: (path: string) => void,
+    token: string | null,
+    loadAsync: (id: string, token: string) => void,
+    loading: boolean
 }
 
 class Availability extends Component<IAvailabilityProps, {isOpen: boolean, value: string, statusCode: number}> {
@@ -63,6 +68,15 @@ class Availability extends Component<IAvailabilityProps, {isOpen: boolean, value
             value: '',
             statusCode: 0
         };
+    }
+
+    componentDidMount() {
+        const { match } = this.props;
+        const { params } = match;
+
+        if (this.props.token !== null) {
+            this.props.loadAsync(params.id, this.props.token);
+        }
     }
 
     render() {
@@ -92,6 +106,9 @@ class Availability extends Component<IAvailabilityProps, {isOpen: boolean, value
                         </BreadcrumbItem>
                     </Breadcrumb>
                 <Code margin={2}>{url}</Code>
+                {this.props.loading 
+                    ? <div style={{textAlign:'center'}}><CircularProgress isIndeterminate color="green"></CircularProgress></div> 
+                    : null}
                 </div>
                 <Divider/>
                 <div style={{textAlign:'left', width:'50%', margin:'0 auto'}}>
@@ -115,6 +132,7 @@ class Availability extends Component<IAvailabilityProps, {isOpen: boolean, value
                         </TabList>
                         <TabPanels>
                             <TabPanel>
+                                {this.props.loading === false ?
                                 <Chart
                                     chartType='AreaChart'
                                     data={this.chartLogs()}
@@ -131,15 +149,16 @@ class Availability extends Component<IAvailabilityProps, {isOpen: boolean, value
                                             duration: 512,
                                         },
                                         enableInteractivity: false,
-                                    }} />
+                                    }} /> : null
+                                }
                                 <Divider/>
                                 <List spacing={3} marginTop={5}>
                                     {availabilityLogs.map(log => (
                                         <ListItem onClick={() => this.onOpen(log.body, log.statusCode)} className={styles.listItem}>
-                                            {log.statusCode === expectedStatusCode || log.body !== expectedResponse
+                                            {log.statusCode === expectedStatusCode && log.body === expectedResponse
                                                 ? <ListIcon icon="check-circle" color="green.500" /> 
                                                 : <ListIcon icon="check-circle" color="pink.500" />}
-                                            <small>[{log.createdAt.toUTCString()}]</small> <Code>{log.statusCode}</Code> in <Code>{log.responseTime}ms</Code>
+                                            <small>[{log.createdAt}]</small> <Code>{log.statusCode}</Code> in <Code>{log.responseTime}ms</Code>
                                         </ListItem>
                                     ))}
                                 </List>
@@ -176,8 +195,9 @@ class Availability extends Component<IAvailabilityProps, {isOpen: boolean, value
         const { availabilityLogs, expectedResponse, expectedStatusCode } = this.props;
 
         availabilityLogs?.slice(0, 10)?.map(log => {
-            let hours = log.createdAt.getHours();
-            let minutes = log.createdAt.getMinutes();
+            let date = new Date(Date.parse(log.createdAt));
+            let hours = date.getHours();
+            let minutes = date.getMinutes();
             
             data.push([`${hours}:${minutes}`, log.statusCode !== expectedStatusCode || log.body !== expectedResponse ? 0 : 100])
         });
@@ -206,12 +226,14 @@ const mapStateToProps = (state: RootState) => {
         expectedStatusCode: state.availiability.expectedStatusCode,
         expectedResponse: state.availiability.expectedResponse,
         availabilityLogs: state.availiability.availabilityLogs,
-        status: state.availiability.status
+        status: state.availiability.status,
+        token: state.account.token,
+        loading: state.availiability.loading
     }
 }
 
 const mapDispatchToProps = (dispatch: any) => {
-    return bindActionCreators({ push }, dispatch)
+    return bindActionCreators({ push, loadAsync }, dispatch)
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Availability)
