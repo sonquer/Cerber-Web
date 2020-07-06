@@ -92,7 +92,7 @@ class Login extends Component<ILoginProps, {}> {
                                 variantColor="teal"
                                 isLoading={props.isSubmitting}
                                 type="submit">
-                                Login
+                                    Login
                             </Button>
                             </form>
                         )}

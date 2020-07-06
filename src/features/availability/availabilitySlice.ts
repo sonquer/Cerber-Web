@@ -31,6 +31,34 @@ const initialState: AvailabilityState = {
     loading: true
 };
 
+const create = createAsyncThunk<AvailabilityState, {
+    name: string, 
+    url: string, 
+    expectedStatusCode: number, 
+    expectedResponse: string, 
+    logLifetimeThresholdInHours: number,
+    token: string
+}>(
+    'availability/create',
+    async (args) => {
+        const response = await axios.post(`https://cluster.cerber.space/gateway/availability/api/Availability/`, 
+        {
+            name: args.name,
+            url: args.url,
+            expectedResponse: args.expectedResponse,
+            expectedStatusCode: args.expectedStatusCode,
+            logLifetimeThresholdInHours: args.logLifetimeThresholdInHours
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${args.token}`
+            }
+        });
+
+        return response.data
+    }
+)
+
 const load = createAsyncThunk<AvailabilityState, {id: string, token: string}>(
     'availability/load',
     async (args) => {
@@ -55,6 +83,7 @@ export const availabilitySlice = createSlice({
             state.availabilityLogs = [];
             state.expectedStatusCode = 200;
             state.expectedResponse = null;
+            state.loading = false;
         },
         nameOnChange: (state, action: PayloadAction<string>) => {
             state.name = action.payload;
@@ -70,6 +99,9 @@ export const availabilitySlice = createSlice({
         },
     },
     extraReducers: {
+        [load.pending.type]: (state, action : PayloadAction<AvailabilityState>) => {
+            state.loading = true;
+        },
         [load.fulfilled.type]: (state, action : PayloadAction<AvailabilityState>) => {
             state.id = action.payload.id;
             state.name = action.payload.name;
@@ -100,6 +132,17 @@ export const availabilitySlice = createSlice({
 
 export const loadAsync = (id: string, token: string): AppThunk => dispatch => {
     dispatch(load({id, token}));
+};
+
+export const createAsync = (
+    name: string, 
+    url: string, 
+    expectedStatusCode: number, 
+    expectedResponse: string, 
+    logLifetimeThresholdInHours: number,
+    token: string
+): AppThunk => dispatch => {
+    dispatch(create({name, url, expectedStatusCode, expectedResponse, logLifetimeThresholdInHours, token}));
 };
 
 export const { 

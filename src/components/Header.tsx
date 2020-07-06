@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { Box, Image } from "@chakra-ui/core";
+import { Box, Image, Badge } from "@chakra-ui/core";
+import { NavLink } from "react-router-dom";
 
 class Header extends Component {
     render() {
@@ -14,7 +15,12 @@ class Header extends Component {
                         fontSize="m"
                         textTransform="uppercase"
                         ml={2} >
-                            Cerber
+                            <NavLink to="/">
+                                Cerber
+                                <Badge variant="subtle" variantColor="yellow" ml={2}>
+                                    beta
+                                </Badge>
+                            </NavLink>
                     </Box>
                 </Box>
             </Box>

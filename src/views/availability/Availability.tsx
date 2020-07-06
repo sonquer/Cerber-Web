@@ -28,7 +28,8 @@ import {
     MenuList,
     MenuButton,
     MenuItem,
-    CircularProgress
+    CircularProgress,
+    Box
 } from '@chakra-ui/core';
 import Editor from "@monaco-editor/react";
 import { Chart } from "react-google-charts";
@@ -132,7 +133,7 @@ class Availability extends Component<IAvailabilityProps, {isOpen: boolean, value
                         </TabList>
                         <TabPanels>
                             <TabPanel>
-                                {this.props.loading === false ?
+                                {this.props.loading === false && this.props.availabilityLogs.length > 0 ?
                                 <Chart
                                     chartType='AreaChart'
                                     data={this.chartLogs()}
@@ -151,6 +152,7 @@ class Availability extends Component<IAvailabilityProps, {isOpen: boolean, value
                                         enableInteractivity: false,
                                     }} /> : null
                                 }
+                                {this.props.loading === false && this.props.availabilityLogs.length <= 0 ? <Box>No data.</Box> : null}
                                 <Divider/>
                                 <List spacing={3} marginTop={5}>
                                     {availabilityLogs.map(log => (

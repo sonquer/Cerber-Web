@@ -11,7 +11,9 @@ import {
     Breadcrumb,
     BreadcrumbItem,
     BreadcrumbLink,
-    Divider
+    Divider,
+    Button,
+    CircularProgress
 } from "@chakra-ui/core";
 import { 
     createNew, 
@@ -23,6 +25,7 @@ import {
 import { ControlledEditor } from "@monaco-editor/react";
 import Header from '../../components/Header';
 import Authentication from "../../components/Authentication";
+import { loadAsync, createAsync } from '../../features/availability/availabilitySlice';
 
 interface IConfigurationParams {
     match: any;
@@ -35,22 +38,45 @@ interface IConfigurationParams {
     name: string | null,
     url: string | null,
     expectedStatusCode: number,
-    expectedResponse: string | null
+    expectedResponse: string | null,
+    token: string | null,
+    loadAsync: (id: string, token: string) => void,
+    loading: boolean,
+    createAsync: (
+        name: string, 
+        url: string, 
+        expectedStatusCode: number, 
+        expectedResponse: string, 
+        logLifetimeThresholdInHours: number,
+        token: string
+    ) => void
 }
 
 class Configuration extends Component<IConfigurationParams, {}> {
     editorRef: { getValue: () => {} } | null = null;
 
     componentDidMount() {
-        const { params } = this.props.match;        
+        const { params } = this.props.match;
         if (params.id === 'create') {
             const { createNew } = this.props;
 
             createNew();
+        } else {
+            this.props.loadAsync(params.id, this.props.token ?? '');
         }
     }
 
     render() {
+        const { params } = this.props.match;
+
+        if (this.props.loading) {
+            return (<div style={{textAlign:'center'}}>
+                <Authentication />
+                <Header />
+                <CircularProgress mt={2} isIndeterminate color="green"></CircularProgress>
+            </div>);
+        }
+
         return (
             <Stack>
                 <Authentication />
@@ -59,10 +85,13 @@ class Configuration extends Component<IConfigurationParams, {}> {
                     <BreadcrumbItem>
                         <BreadcrumbLink href="/">Home</BreadcrumbLink>
                     </BreadcrumbItem>
-
                     <BreadcrumbItem isCurrentPage>
-                        <BreadcrumbLink href="#">Configuration</BreadcrumbLink>
+                        <BreadcrumbLink>Configuration</BreadcrumbLink>
                     </BreadcrumbItem>
+                    {params.id !== 'create' ?
+                    <BreadcrumbItem isCurrentPage>
+                        <BreadcrumbLink>{params.id}</BreadcrumbLink>
+                    </BreadcrumbItem> : null}
                 </Breadcrumb>
                 <Divider />
                 <Box style={{width:'50%', margin:'0 auto'}}>
@@ -103,6 +132,20 @@ class Configuration extends Component<IConfigurationParams, {}> {
                                 value={this.props.expectedResponse} />
                         </div>
                     </div>
+                    <Button mt={2}
+                        variantColor="teal"
+                        onClick={() => {
+                            if (params.id === 'create') {
+                                this.props.createAsync(this.props.name ?? '',
+                                    this.props.url ?? '',
+                                    this.props.expectedStatusCode,
+                                    this.props.expectedResponse ?? '',
+                                    12,
+                                    this.props.token ?? '');
+                            }
+                        }}>
+                            Save
+                    </Button>
                 </Box>
             </Stack>
         );
@@ -116,7 +159,9 @@ const mapStateToProps = (state: RootState) => {
         name: state.availiability.name,
         url: state.availiability.url,
         expectedStatusCode: state.availiability.expectedStatusCode,
-        expectedResponse: state.availiability.expectedResponse
+        expectedResponse: state.availiability.expectedResponse,
+        token: state.account.token,
+        loading: state.availiability.loading
     };
 }
 
@@ -127,6 +172,8 @@ const mapDispatchToProps = (dispatch: any) => {
         urlOnChange,
         expectedStatusCodeOnChange,
         expectedResponseOnChange,
+        loadAsync,
+        createAsync
     }, dispatch)
 }
 
