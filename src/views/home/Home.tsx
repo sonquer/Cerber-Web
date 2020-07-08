@@ -49,7 +49,8 @@ class Home extends Component<IHomeProps> {
                                 Actions
                             </Button>
                             <MenuList>
-                                <MenuItem onClick={this.newAvailabilityItem}>Add new</MenuItem>
+                                <MenuItem onClick={this.newAvailabilityItem}>Add new record</MenuItem>
+                                <MenuItem onClick={this.logout}>Logout</MenuItem>
                             </MenuList>
                         </Menu>
                     </div>
@@ -63,6 +64,12 @@ class Home extends Component<IHomeProps> {
 
     newAvailabilityItem = () => {
         this.props.push(`/configuration/create`);
+    }
+
+    logout = () => {
+        localStorage.clear();
+        sessionStorage.clear();
+        this.props.push(`/login`);
     }
 
     renderItems = () => {

@@ -1,5 +1,4 @@
 import { configureStore, ThunkAction, Action, getDefaultMiddleware, combineReducers } from '@reduxjs/toolkit';
-import counterReducer from '../features/counter/counterSlice';
 import accountReducer from '../features/account/accountSlice';
 import availabilityReducer from '../features/availability/availabilitySlice';
 import availabilityListReducer from '../features/availabilityList/availabilityListSlice';
@@ -14,7 +13,6 @@ export const store = configureStore({
   reducer: combineReducers({
     router: connectRouter(history),
     account: accountReducer,
-    counter: counterReducer,
     availabilityList: availabilityListReducer,
     availiability: availabilityReducer
   }),
