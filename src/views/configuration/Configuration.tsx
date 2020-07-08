@@ -25,7 +25,7 @@ import {
 import { ControlledEditor } from "@monaco-editor/react";
 import Header from '../../components/Header';
 import Authentication from "../../components/Authentication";
-import { loadAsync, createAsync } from '../../features/availability/availabilitySlice';
+import { loadAsync, createAsync, updateAsync } from '../../features/availability/availabilitySlice';
 
 interface IConfigurationParams {
     match: any;
@@ -43,6 +43,15 @@ interface IConfigurationParams {
     loadAsync: (id: string, token: string) => void,
     loading: boolean,
     createAsync: (
+        name: string, 
+        url: string, 
+        expectedStatusCode: number, 
+        expectedResponse: string, 
+        logLifetimeThresholdInHours: number,
+        token: string
+    ) => void,
+    updateAsync: (
+        id: string,
         name: string, 
         url: string, 
         expectedStatusCode: number, 
@@ -142,6 +151,14 @@ class Configuration extends Component<IConfigurationParams, {}> {
                                     this.props.expectedResponse ?? '',
                                     12,
                                     this.props.token ?? '');
+                            } else {
+                                this.props.updateAsync(params.id,
+                                    this.props.name ?? '',
+                                    this.props.url ?? '',
+                                    this.props.expectedStatusCode,
+                                    this.props.expectedResponse ?? '',
+                                    12,
+                                    this.props.token ?? '');
                             }
                         }}>
                             Save
@@ -173,7 +190,8 @@ const mapDispatchToProps = (dispatch: any) => {
         expectedStatusCodeOnChange,
         expectedResponseOnChange,
         loadAsync,
-        createAsync
+        createAsync,
+        updateAsync
     }, dispatch)
 }
 

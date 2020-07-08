@@ -59,6 +59,36 @@ const create = createAsyncThunk<AvailabilityState, {
     }
 )
 
+const update = createAsyncThunk<AvailabilityState, {
+    id: string,
+    name: string, 
+    url: string, 
+    expectedStatusCode: number, 
+    expectedResponse: string, 
+    logLifetimeThresholdInHours: number,
+    token: string
+}>(
+    'availability/update',
+    async (args) => {
+        const response = await axios.put(`https://cluster.cerber.space/gateway/availability/api/Availability/`, 
+        {
+            id: args.id,
+            name: args.name,
+            url: args.url,
+            expectedResponse: args.expectedResponse,
+            expectedStatusCode: args.expectedStatusCode,
+            logLifetimeThresholdInHours: args.logLifetimeThresholdInHours
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${args.token}`
+            }
+        });
+
+        return response.data
+    }
+)
+
 const load = createAsyncThunk<AvailabilityState, {id: string, token: string}>(
     'availability/load',
     async (args) => {
@@ -126,6 +156,24 @@ export const availabilitySlice = createSlice({
         },
         [load.rejected.type]: (state, action : PayloadAction<AvailabilityState>) => {
             state.loading = false;
+        },
+        [create.pending.type]: (state, action : PayloadAction<AvailabilityState>) => {
+            state.loading = true;
+        },
+        [create.fulfilled.type]: (state, action : PayloadAction<AvailabilityState>) => {
+            state.loading = false;
+        },
+        [create.rejected.type]: (state, action : PayloadAction<AvailabilityState>) => {
+            state.loading = false;
+        },
+        [update.pending.type]: (state, action : PayloadAction<AvailabilityState>) => {
+            state.loading = true;
+        },
+        [update.fulfilled.type]: (state, action : PayloadAction<AvailabilityState>) => {
+            state.loading = false;
+        },
+        [update.rejected.type]: (state, action : PayloadAction<AvailabilityState>) => {
+            state.loading = false;
         }
     }
 });
@@ -143,6 +191,18 @@ export const createAsync = (
     token: string
 ): AppThunk => dispatch => {
     dispatch(create({name, url, expectedStatusCode, expectedResponse, logLifetimeThresholdInHours, token}));
+};
+
+export const updateAsync = (
+    id: string,
+    name: string, 
+    url: string, 
+    expectedStatusCode: number, 
+    expectedResponse: string, 
+    logLifetimeThresholdInHours: number,
+    token: string
+): AppThunk => dispatch => {
+    dispatch(update({id, name, url, expectedStatusCode, expectedResponse, logLifetimeThresholdInHours, token}));
 };
 
 export const { 
