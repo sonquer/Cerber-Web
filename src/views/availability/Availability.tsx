@@ -156,7 +156,7 @@ class Availability extends Component<IAvailabilityProps, {isOpen: boolean, value
                                 <Divider/>
                                 <List spacing={3} marginTop={5}>
                                     {availabilityLogs.map(log => (
-                                        <ListItem onClick={() => this.onOpen(log.body, log.statusCode)} className={styles.listItem}>
+                                        <ListItem key={log.createdAt} onClick={() => this.onOpen(log.body, log.statusCode)} className={styles.listItem}>
                                             {log.statusCode === expectedStatusCode && log.body === expectedResponse
                                                 ? <ListIcon icon="check-circle" color="green.500" /> 
                                                 : <ListIcon icon="check-circle" color="pink.500" />}
