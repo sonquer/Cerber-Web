@@ -13,7 +13,11 @@ import {
     BreadcrumbLink,
     Divider,
     Button,
-    CircularProgress
+    CircularProgress,
+    Alert,
+    AlertIcon,
+    AlertTitle,
+    AlertDescription
 } from "@chakra-ui/core";
 import { 
     createNew, 
@@ -25,7 +29,8 @@ import {
 import { ControlledEditor } from "@monaco-editor/react";
 import Header from '../../components/Header';
 import Authentication from "../../components/Authentication";
-import { loadAsync, createAsync, updateAsync } from '../../features/availability/availabilitySlice';
+import { loadAsync, createAsync, updateAsync, removeAsync } from '../../features/availability/availabilitySlice';
+import { Redirect } from "react-router-dom";
 
 interface IConfigurationParams {
     match: any;
@@ -34,6 +39,7 @@ interface IConfigurationParams {
     urlOnChange: (value: string) => {},
     expectedStatusCodeOnChange: (value: number) => {},
     expectedResponseOnChange: (value: string) => {},
+    saved: boolean,
     id: string | null,
     name: string | null,
     url: string | null,
@@ -42,6 +48,7 @@ interface IConfigurationParams {
     token: string | null,
     loadAsync: (id: string, token: string) => void,
     loading: boolean,
+    errorMessage: string | null,
     createAsync: (
         name: string, 
         url: string, 
@@ -57,6 +64,10 @@ interface IConfigurationParams {
         expectedStatusCode: number, 
         expectedResponse: string, 
         logLifetimeThresholdInHours: number,
+        token: string
+    ) => void,
+    removeAsync: (
+        id: string,
         token: string
     ) => void
 }
@@ -88,8 +99,10 @@ class Configuration extends Component<IConfigurationParams, {}> {
 
         return (
             <Stack>
+                {this.props.saved ? <Redirect to="/" /> : null}
                 <Authentication />
                 <Header />
+                {this.props.errorMessage != null ? this.errorWindow() : null}
                 <Breadcrumb style={{textAlign:'center', marginTop: 10}}>
                     <BreadcrumbItem>
                         <BreadcrumbLink href="/">Home</BreadcrumbLink>
@@ -163,8 +176,28 @@ class Configuration extends Component<IConfigurationParams, {}> {
                         }}>
                             Save
                     </Button>
+                    {params.id !== 'create' ?
+                    <Button mt={2} ml={2}
+                        variantColor="pink"
+                        onClick={() => {
+                            this.props.removeAsync(params.id, this.props.token ?? '');
+                        }}>
+                            Delete
+                    </Button> : null}
                 </Box>
             </Stack>
+        );
+    }
+
+    errorWindow() {
+        const { errorMessage } = this.props;
+
+        return (
+            <Alert status="error">
+                <AlertIcon />
+                <AlertTitle mr={2}>Error!</AlertTitle>
+                <AlertDescription>{errorMessage}</AlertDescription>
+            </Alert>
         );
     }
 }
@@ -178,7 +211,9 @@ const mapStateToProps = (state: RootState) => {
         expectedStatusCode: state.availiability.expectedStatusCode,
         expectedResponse: state.availiability.expectedResponse,
         token: state.account.token,
-        loading: state.availiability.loading
+        loading: state.availiability.loading,
+        saved: state.availiability.saved,
+        errorMessage: state.availiability.errorMessage
     };
 }
 
@@ -191,7 +226,8 @@ const mapDispatchToProps = (dispatch: any) => {
         expectedResponseOnChange,
         loadAsync,
         createAsync,
-        updateAsync
+        updateAsync,
+        removeAsync
     }, dispatch)
 }
 

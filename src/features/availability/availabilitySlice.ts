@@ -17,7 +17,9 @@ interface AvailabilityState {
     expectedResponse: string | null,
     availabilityLogs: IAvailabilityLog[],
     status: 'ST_ERROR' | 'ST_OK',
-    loading: boolean
+    loading: boolean,
+    saved: boolean,
+    errorMessage: string | null,
 }
 
 const initialState: AvailabilityState = {
@@ -28,7 +30,9 @@ const initialState: AvailabilityState = {
     expectedResponse: '{}',
     availabilityLogs: [],
     status: 'ST_OK',
-    loading: true
+    loading: true,
+    saved: false,
+    errorMessage: null
 };
 
 const create = createAsyncThunk<AvailabilityState, {
@@ -89,6 +93,22 @@ const update = createAsyncThunk<AvailabilityState, {
     }
 )
 
+const remove = createAsyncThunk<AvailabilityState, {
+    id: string,
+    token: string
+}>(
+    'availability/remove',
+    async (args) => {
+        const response = await axios.delete(`https://cluster.cerber.space/gateway/availability/api/Availability/${args.id}`, {
+            headers: {
+                Authorization: `Bearer ${args.token}`
+            }
+        });
+
+        return response.data
+    }
+)
+
 const load = createAsyncThunk<AvailabilityState, {id: string, token: string}>(
     'availability/load',
     async (args) => {
@@ -114,6 +134,7 @@ export const availabilitySlice = createSlice({
             state.expectedStatusCode = 200;
             state.expectedResponse = null;
             state.loading = false;
+            state.saved = false;
         },
         nameOnChange: (state, action: PayloadAction<string>) => {
             state.name = action.payload;
@@ -153,27 +174,45 @@ export const availabilitySlice = createSlice({
             state.availabilityLogs = logs;
 
             state.loading = false;
+            state.saved = false;
+            state.errorMessage = null;
         },
         [load.rejected.type]: (state, action : PayloadAction<AvailabilityState>) => {
             state.loading = false;
+            state.errorMessage = 'Loading failed..';
         },
         [create.pending.type]: (state, action : PayloadAction<AvailabilityState>) => {
             state.loading = true;
         },
         [create.fulfilled.type]: (state, action : PayloadAction<AvailabilityState>) => {
             state.loading = false;
+            state.saved = true;
         },
         [create.rejected.type]: (state, action : PayloadAction<AvailabilityState>) => {
             state.loading = false;
+            state.errorMessage = 'Creating failed..';
         },
         [update.pending.type]: (state, action : PayloadAction<AvailabilityState>) => {
             state.loading = true;
         },
         [update.fulfilled.type]: (state, action : PayloadAction<AvailabilityState>) => {
             state.loading = false;
+            state.saved = true;
         },
         [update.rejected.type]: (state, action : PayloadAction<AvailabilityState>) => {
             state.loading = false;
+            state.errorMessage = 'Update failed..';
+        },
+        [remove.pending.type]: (state, action : PayloadAction<AvailabilityState>) => {
+            state.loading = true;
+        },
+        [remove.fulfilled.type]: (state, action : PayloadAction<AvailabilityState>) => {
+            state.loading = false;
+            state.saved = true;
+        },
+        [remove.rejected.type]: (state, action : PayloadAction<AvailabilityState>) => {
+            state.loading = false;
+            state.errorMessage = 'Removing failed..';
         }
     }
 });
@@ -203,6 +242,13 @@ export const updateAsync = (
     token: string
 ): AppThunk => dispatch => {
     dispatch(update({id, name, url, expectedStatusCode, expectedResponse, logLifetimeThresholdInHours, token}));
+};
+
+export const removeAsync = (
+    id: string,
+    token: string
+): AppThunk => dispatch => {
+    dispatch(remove({id, token}));
 };
 
 export const { 
